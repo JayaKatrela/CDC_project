@@ -7,7 +7,7 @@ USER root
 RUN pip install pyspark boto3 psycopg2-binary
 
 # Add your job script
-COPY cdc_job.py /app/cdc_job.py
+COPY cdc.py /app/cdc.py
 
 # Set environment variables for AWS (or override in Jenkins)
 ENV AWS_ACCESS_KEY_ID=your-access-key
