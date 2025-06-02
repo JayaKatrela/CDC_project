@@ -15,4 +15,4 @@ ENV AWS_SECRET_ACCESS_KEY=your-secret-key
 
 WORKDIR /app
 
-CMD ["spark-submit", "--packages", "org.postgresql:postgresql:42.5.0,org.apache.hadoop:hadoop-aws:3.2.0", "cdc_job.py"]
+CMD ["spark-submit", "--packages", "org.postgresql:postgresql:42.5.0,org.apache.hadoop:hadoop-aws:3.2.0", "cdc.py"]
