@@ -1,0 +1,51 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE = 'jayakatrela/cdc'
+        TAG = 'latest'
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build("${IMAGE}:${TAG}")
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                withDockerRegistry(credentialsId: 'dockerhub-creds', url: '') {
+                    docker.image("${IMAGE}:${TAG}").push()
+                }
+            }
+        }
+
+        stage('Run with AWS Credentials') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'aws-credentials',
+                    usernameVariable: 'AWS_ACCESS_KEY_ID',
+                    passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                )]) {
+                    script {
+                        docker.image("${IMAGE}:${TAG}").withRun(
+                            "-e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID " +
+                            "-e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"
+                        ) {
+                            echo "Spark job ran successfully with injected AWS credentials"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
