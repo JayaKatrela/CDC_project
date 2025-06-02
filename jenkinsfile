@@ -12,17 +12,27 @@
                 git url: 'https://github.com/JayaKatrela/CDC_project.git', branch: 'main'
             }
         }
-        
+
         stage('Build Docker Image') {
             steps {
                 script {
-                    withCredentials([usernamePassword(
-                        credentialsId: 'jayahub',
-                        usernameVariable: 'DOCKER_HUB_USERNAME',
-                        passwordVariable: 'DOCKER_HUB_PASSWORD'
-                    )]) {
+                    withCredentials([
+                        usernamePassword(
+                            credentialsId: 'jayahub',
+                            usernameVariable: 'DOCKER_HUB_USERNAME',
+                            passwordVariable: 'DOCKER_HUB_PASSWORD'
+                        ),
+                        string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
+                        string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
+                    ]) {
                         sh 'echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin'
-                        sh 'docker build -t $DOCKER_IMAGE .'
+
+                        // Pass AWS credentials as build arguments
+                        sh '''
+                            docker build --build-arg AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+                                         --build-arg AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+                                         -t $DOCKER_IMAGE .
+                        '''
                     }
                 }
             }
@@ -30,9 +40,7 @@
 
         stage('Push Docker Image to Docker Hub') {
             steps {
-                script {
-                    sh 'docker push $DOCKER_IMAGE'
-                }
+                sh 'docker push $DOCKER_IMAGE'
             }
         }
     }
