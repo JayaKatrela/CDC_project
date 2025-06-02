@@ -1,17 +1,17 @@
-# Use an official Spark image or build your own
 FROM bitnami/spark:3.4.1
 
 USER root
 
-# Install Python packages
 RUN pip install pyspark boto3 psycopg2-binary
 
-# Add your job script
 COPY cdc.py /app/cdc.py
 
-# Set environment variables for AWS (or override in Jenkins)
-ENV AWS_ACCESS_KEY_ID=your-access-key
-ENV AWS_SECRET_ACCESS_KEY=your-secret-key
+# Receive AWS credentials from Jenkins
+ARG AWS_ACCESS_KEY_ID
+ARG AWS_SECRET_ACCESS_KEY
+
+ENV AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+ENV AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
 
 WORKDIR /app
 

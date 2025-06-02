@@ -22,12 +22,14 @@
                             usernameVariable: 'DOCKER_HUB_USERNAME',
                             passwordVariable: 'DOCKER_HUB_PASSWORD'
                         ),
-                        string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
-                        string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
+                        usernamePassword(
+                            credentialsId: 'aws-credentials',
+                            usernameVariable: 'AWS_ACCESS_KEY_ID',
+                            passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                        )
                     ]) {
                         sh 'echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin'
 
-                        // Pass AWS credentials as build arguments
                         sh '''
                             docker build --build-arg AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
                                          --build-arg AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
