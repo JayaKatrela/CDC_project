@@ -9,7 +9,7 @@
     stages {
         stage('Clone Repository') {
             steps {
-                git url: 'https://github.com/JayaKatrela/CDC_project.git', branch: 'main'
+                git url: 'https://github.com/JayaKatrela/CDC_project', branch: 'main'
             }
         }
 
